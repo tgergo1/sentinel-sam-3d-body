@@ -48,7 +48,7 @@ python process_video.py \
 2. **Download Model Checkpoints**: 
    ```bash
    # Download the model from HuggingFace (requires access approval)
-   hf download facebook/sam-3d-body-dinov3 --local-dir checkpoints/sam-3d-body-dinov3
+   huggingface-cli download facebook/sam-3d-body-dinov3 --local-dir checkpoints/sam-3d-body-dinov3
    ```
 
 3. **Prepare Input Video**: Ensure your video file is in a supported format (mp4, avi, mov, etc.)

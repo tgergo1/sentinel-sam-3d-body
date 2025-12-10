@@ -181,6 +181,8 @@ def main(args):
     # Validate and initialize video codec
     if len(args.codec) != 4:
         raise ValueError(f"Video codec must be exactly 4 characters (e.g., 'mp4v', 'XVID'). Got: '{args.codec}'")
+    if not args.codec.isalnum():
+        raise ValueError(f"Video codec must contain only alphanumeric characters. Got: '{args.codec}'")
     
     # Initialize video writer with configurable codec
     fourcc = cv2.VideoWriter_fourcc(*args.codec)
@@ -205,7 +207,6 @@ def main(args):
     total_frames = min(frame_count, max_frames) if max_frames else frame_count
     
     # Prepare frames directory if saving individual frames
-    frames_dir = None
     if args.save_frames:
         frames_dir = output_video.parent / f"{output_video.stem}_frames"
         frames_dir.mkdir(exist_ok=True)
@@ -225,7 +226,7 @@ def main(args):
             out.write(rendered_frame)
             
             # Optionally save individual frames
-            if args.save_frames and frames_dir is not None:
+            if args.save_frames:
                 frame_path = frames_dir / f"frame_{frame_idx:06d}.jpg"
                 cv2.imwrite(str(frame_path), rendered_frame)
     
@@ -235,7 +236,7 @@ def main(args):
     print(f"\nVideo processing complete!")
     print(f"Output saved to: {output_video}")
     
-    if args.save_frames and frames_dir is not None:
+    if args.save_frames:
         print(f"Individual frames saved to: {frames_dir}")
 
 
