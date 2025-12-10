@@ -84,7 +84,7 @@ def process_video_frames(video_path, estimator, bbox_thr=0.8, use_mask=False, ma
                 use_mask=use_mask,
             )
             
-            # Visualize results - note that visualize_sample_together expects BGR input
+            # Visualize results (visualize_sample_together expects BGR format, which 'frame' is)
             if len(outputs) > 0:
                 # If multiple people detected, take only the first one (assumption: single human)
                 if len(outputs) > 1:
@@ -119,7 +119,9 @@ def main(args):
         output_video = output_folder / f"{input_name}_3d_body.mp4"
     else:
         output_video = Path(args.output_video)
-        output_video.parent.mkdir(parents=True, exist_ok=True)
+        # Create parent directory if it doesn't exist (and it's not just current directory)
+        if output_video.parent != Path("."):
+            output_video.parent.mkdir(parents=True, exist_ok=True)
     
     print(f"Input video: {args.input_video}")
     print(f"Output video: {output_video}")
@@ -151,7 +153,7 @@ def main(args):
             name=args.detector_name, device=device, path=detector_path
         )
     
-    if len(segmentor_path):
+    if segmentor_path:
         print(f"Loading human segmentor: {args.segmentor_name}...")
         from tools.build_sam import HumanSegmentor
         human_segmentor = HumanSegmentor(
@@ -176,8 +178,9 @@ def main(args):
     output_width = width * 4
     output_height = height
     
-    # Initialize video writer
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    # Initialize video writer with configurable codec
+    # Use mp4v by default, which is widely compatible
+    fourcc = cv2.VideoWriter_fourcc(*args.codec)
     out = cv2.VideoWriter(
         str(output_video),
         fourcc,
@@ -351,6 +354,12 @@ Environment Variables:
         action="store_true",
         default=False,
         help="Save individual processed frames as images",
+    )
+    parser.add_argument(
+        "--codec",
+        default="mp4v",
+        type=str,
+        help="Video codec for output (default: mp4v). Common options: mp4v, XVID, avc1, H264",
     )
     
     args = parser.parse_args()
