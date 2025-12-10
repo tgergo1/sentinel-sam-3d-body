@@ -1,9 +1,12 @@
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 
 import os
+import sys
 
 if "PYOPENGL_PLATFORM" not in os.environ:
-    os.environ["PYOPENGL_PLATFORM"] = "egl"
+    # Only use EGL on Linux; macOS and Windows should use native OpenGL
+    if sys.platform.startswith('linux'):
+        os.environ["PYOPENGL_PLATFORM"] = "egl"
 from typing import List, Optional
 
 import cv2
