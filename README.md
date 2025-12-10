@@ -116,6 +116,20 @@ cv2.imwrite("output.jpg", rend_img.astype(np.uint8))
 
 For a complete demo with visualization, see [notebook/demo_human.ipynb](notebook/demo_human.ipynb).
 
+### Video Processing
+
+To process video files and generate 3D body estimation for each frame:
+
+```bash
+# Process a video file
+python process_video.py \
+    --input_video <path_to_video> \
+    --output_video <path_to_output> \
+    --checkpoint_path ./checkpoints/sam-3d-body-dinov3/model.ckpt \
+    --mhr_path ./checkpoints/sam-3d-body-dinov3/assets/mhr_model.pt
+```
+
+The output video will show four views side-by-side: original frame, 2D keypoints overlay, 3D mesh overlay, and 3D mesh side view. For detailed instructions and options, see [VIDEO_PROCESSING.md](VIDEO_PROCESSING.md).
 
 ## Model Description
 
