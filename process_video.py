@@ -153,7 +153,7 @@ def main(args):
             name=args.detector_name, device=device, path=detector_path
         )
     
-    if segmentor_path:
+    if len(segmentor_path):
         print(f"Loading human segmentor: {args.segmentor_name}...")
         from tools.build_sam import HumanSegmentor
         human_segmentor = HumanSegmentor(
@@ -178,8 +178,11 @@ def main(args):
     output_width = width * 4
     output_height = height
     
+    # Validate and initialize video codec
+    if len(args.codec) != 4:
+        raise ValueError(f"Video codec must be exactly 4 characters (e.g., 'mp4v', 'XVID'). Got: '{args.codec}'")
+    
     # Initialize video writer with configurable codec
-    # Use mp4v by default, which is widely compatible
     fourcc = cv2.VideoWriter_fourcc(*args.codec)
     out = cv2.VideoWriter(
         str(output_video),
@@ -189,7 +192,11 @@ def main(args):
     )
     
     if not out.isOpened():
-        raise RuntimeError(f"Failed to open video writer for: {output_video}")
+        raise RuntimeError(
+            f"Failed to open video writer for: {output_video}\n"
+            f"This might be due to an unsupported codec ('{args.codec}'). "
+            f"Try a different codec with --codec (e.g., 'XVID', 'avc1', 'H264')"
+        )
     
     print("Processing video frames...")
     
