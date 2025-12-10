@@ -10,7 +10,6 @@ Assumes there is only one human per frame in the video.
 
 import argparse
 import os
-import tempfile
 from pathlib import Path
 
 import pyrootutils
@@ -195,6 +194,12 @@ def main(args):
     max_frames = args.max_frames if args.max_frames > 0 else None
     total_frames = min(frame_count, max_frames) if max_frames else frame_count
     
+    # Prepare frames directory if saving individual frames
+    frames_dir = None
+    if args.save_frames:
+        frames_dir = output_video.parent / f"{output_video.stem}_frames"
+        frames_dir.mkdir(exist_ok=True)
+    
     try:
         for frame_idx, rendered_frame in tqdm(
             process_video_frames(
@@ -210,9 +215,7 @@ def main(args):
             out.write(rendered_frame)
             
             # Optionally save individual frames
-            if args.save_frames:
-                frames_dir = output_video.parent / f"{output_video.stem}_frames"
-                frames_dir.mkdir(exist_ok=True)
+            if args.save_frames and frames_dir is not None:
                 frame_path = frames_dir / f"frame_{frame_idx:06d}.jpg"
                 cv2.imwrite(str(frame_path), rendered_frame)
     
@@ -222,7 +225,7 @@ def main(args):
     print(f"\nVideo processing complete!")
     print(f"Output saved to: {output_video}")
     
-    if args.save_frames:
+    if args.save_frames and frames_dir is not None:
         print(f"Individual frames saved to: {frames_dir}")
 
 
